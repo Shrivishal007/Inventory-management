@@ -1,0 +1,122 @@
+INSERT INTO sales_person (name, email_id, password) VALUES
+('Aravind Raj', 'aravind.raj@sales.com', '$2b$12$3N8fEPDh04YKKMR7n3P8lODPL5tRjW9vKRFZCJ3i3DhjgEs3r.88G'), -- password: 'Araaj86$'
+('Divya Shree', 'divya.shree@sales.com', '$2b$12$vGNY76fcwP9/LLMtP1NKxeD9ZpL7GhBNt5dNOcyXWoQ1Hkormp5sm'), -- password: 'Divee89^'
+('Karthik Kumar', 'karthik.kumar@sales.com', '$2b$12$j6gqEPCyXUzzhmSHDPVlneN3/19J3hsRO5K9BVAPoSuaADJURnzUy'), -- password: 'Karar26&'
+('Meena Lakshmi', 'meena.lakshmi@sales.com', '$2b$12$RizrWe3LUGwZOf609YqKseXUg3vGaQEgrLdKGKTyTqx7Z5lGB0wh.'), -- password: 'Meemi93@'
+('Saravanan R', 'saravanan.r@sales.com', '$2b$12$Fyqw6Ts1njBrboEhnLEMYOl1m0XrGW6WvDGg2EeMadnCHq7JMiZPS'); -- password: 'SarR25&O'
+
+INSERT INTO contact_details (user_id, contact_number) VALUES
+(1000, '9876543210'),
+(1000, '8247563891'),
+(1001, '9023456712'),
+(1002, '9789654321'),
+(1002, '8098456123'),
+(1003, '9345678123'),
+(1004, '8823456790'),
+(1004, '7356124890');
+
+INSERT INTO address_details (user_id, street, city, pincode) VALUES
+(1000, '14, Gandhi Street', 'Chennai', '600032'),
+(1000, '22, South Avenue', 'Tiruvallur', '602001'),
+(1001, '8, Anna Nagar Main Road', 'Madurai', '625020'),
+(1002, '104, Ramasamy Street', 'Coimbatore', '641002'),
+(1002, '11, Kaveri Nagar', 'Erode', '638001'),
+(1002, '27, Park View Road', 'Salem', '636004'),
+(1003, '6, MG Layout', 'Tirunelveli', '627002'),
+(1003, '50, Bharathi Nagar', 'Nagercoil', '629001'),
+(1004, '35, Raja Street', 'Trichy', '620018');
+
+INSERT INTO rice_details 
+(rice_id, rice_name, description, stock_available, last_changed_date, min_price, max_price, img_path) 
+VALUES
+(1, 'Ponni (Everyday)', 'Standard polished Ponni rice, widely used for daily meals across TN. High demand.', 5487.50, '2025-10-03 09:20:00', 1050.00, 1200.00, '/images/1.jpg'),
+(2, 'Raw Rice (Pachai Arisi)', 'Unboiled, white rice. Essential for Pongal and other religious dishes.', 3200.00, '2025-10-05 14:10:00', 950.00, 1100.00, '/images/2.jpg'),
+(3, 'Boiled Rice (Puzhungal Arisi)', 'Parboiled rice, typically used for Idli/Dosa batter and daily cooking.', 4850.50, '2025-10-15 21:44:19', 1000.00, 1155.75, '/images/3.jpg'),
+(4, 'Sona Masuri', 'A light, aromatic, and medium-grain rice, popular in South Indian states.', 4100.00, '2025-10-09 11:05:00', 1030.00, 1180.00, '/images/4.jpg'),
+(5, 'Basmati (Premium)', 'Long-grain, highly aromatic rice. Used for Biryani and specialty dishes.', 1500.00, '2025-10-12 18:45:00', 1600.00, 1850.00, '/images/5.jpg'),
+(6, 'Idli Rice', 'Short, thick-grain parboiled rice specifically used for making soft Idlis.', 3000.00, '2025-10-08 10:30:00', 980.75, 1120.00, '/images/6.jpg'),
+(7, 'Seeraga Samba', 'Tiny-grain, highly fragrant rice grown in the Delta region. Ideal for authentic Biryani.', 887.50, '2025-10-16 17:40:00', 1300.00, 1445.00, '/images/7.jpg'),
+(8, 'Thanjavur Ponni', 'Superior quality Ponni rice sourced specifically from the Thanjavur (Rice Bowl) region.', 2500.00, '2025-10-13 16:55:00', 1080.00, 1230.00, '/images/8.jpg'),
+(9, 'Brown Rice (Kudiraivali)', 'Unpolished rice, rich in fiber. Growing demand for health-conscious consumers.', 1200.00, '2025-10-07 08:50:00', 1150.00, 1300.00, '/images/9.jpg'),
+(10, 'Red Rice (Karuppu Kavuni)', 'Traditional black/red rice, known for its high nutritional value. Specialty item.', 591.25, '2025-10-11 09:15:00', 1250.00, 1400.00, '/images/10.jpg'),
+(11, 'Matta Rice', 'Red parboiled rice, very popular in Kerala, but sold in border districts of TN.', 941.25, '2025-10-14 12:30:00', 1000.00, 1150.00, '/images/11.jpg'),
+(12, 'Ambemohar', 'A short, plump grain with a sweet aroma, used for desserts and plain rice.', 440.00, '2025-10-04 07:10:00', 1350.00, 1500.00, '/images/12.jpg'),
+(13, 'Ghee Rice Variety', 'Aromatic white rice suitable for making Ghee Rice (Nei Choru).', 700.00, '2025-10-06 16:25:00', 1400.00, 1550.00, '/images/13.jpg'),
+(14, 'Kolam Rice', 'Medium-to-short grain, widely used in Gujarat and Maharashtra but has a market in Chennai.', 1800.00, '2025-10-15 10:10:00', 980.00, 1100.00, '/images/14.jpg'),
+(15, 'Rice Flour (Arisi Maavu)', 'Not a grain, but a stocked product (for baking/snacks).', 400.00, '2025-10-02 08:00:00', 850.00, 950.00, '/images/15.jpg'),
+(16, 'Mapillai Samba', 'A highly valued traditional red rice variety, good for strength and health.', 350.00, '2025-10-09 09:40:00', 1200.00, 1350.00, '/images/16.jpg'),
+(17, 'Kichili Samba', 'A fine, aged white rice with a soft texture, highly prized in traditional meals.', 1100.00, '2025-10-17 20:55:00', 1100.00, 1250.00, '/images/17.jpg'),
+(18, 'Poongar Rice', 'A red rice variety traditionally recommended for women''s health.', 200.00, '2025-10-14 15:45:00', 1150.00, 1300.00, '/images/18.jpg'),
+(19, 'Short Grain (Regular)', 'Cheapest, shortest grain rice, often used in community kitchens.', 3800.00, '2025-10-05 10:15:00', 950.00, 1050.00, '/images/19.jpg'),
+(20, 'Andhra Ponni', 'Ponni sourced from Andhra region, often preferred for its texture.', 1700.00, '2025-10-13 13:10:00', 1020.00, 1170.00, '/images/20.jpg'),
+(21, 'T-4 Rice (Broken)', 'Broken rice pieces, typically used for animal feed or budget purposes.', 250.00, '2025-10-10 18:20:00', 700.00, 850.00, '/images/21.jpg'),
+(22, 'Organic Sona Masuri', 'Sona Masuri grown without chemical fertilizers. Higher price point.', 400.00, '2025-10-08 07:30:00', 1250.00, 1400.00, '/images/22.jpg'),
+(23, 'White Dosa Rice', 'Specific blend used by commercial Dosa batter makers.', 900.00, '2025-10-11 11:50:00', 980.00, 1100.00, '/images/23.jpg'),
+(24, 'Karunkuruvai Rice', 'A thick, highly medicinal black/red rice variety. Very niche market.', 150.00, '2025-10-06 17:40:00', 1300.00, 1450.00, '/images/24.jpg'),
+(25, 'Aged Ponni', 'Ponni rice that has been stored for a year, leading to a fluffier texture when cooked.', 600.00, '2025-10-17 09:05:00', 1080.00, 1230.00, '/images/25.jpg');
+
+INSERT INTO quotes (sales_person_id, status) VALUES
+(1000, 'Approved'),
+(1000, 'Pending'),
+(1000, 'Approved'),
+(1001, 'Approved'),
+(1002, 'Pending'),
+(1002, 'Approved'),
+(1004, 'Rejected');
+
+INSERT INTO quote_items (quote_number, rice_id, quoted_price, quantity) VALUES
+(5001, 1, 1100.00, 30.00),
+(5001, 3, 1120.00, 15.00),
+(5002, 5, 1900.00, 10.00),
+(5002, 7, 1500.00, 5.00),
+(5003, 8, 1150.00, 12.00),
+(5004, 2, 1000.00, 20.00),
+(5004, 6, 1050.00, 25.00),
+(5005, 10, 1100.00, 4.00),
+(5005, 17, 1000.00, 6.00),
+(5006, 11, 1050.00, 8.00),
+(5006, 13, 1500.00, 5.00),
+(5007, 20, 950.00, 10.00);
+
+INSERT INTO orders (order_id, quote_number, total_price, status, order_date, address_id) VALUES
+(100000000000000, 5001, 49800.00, 'Allocated', '2025-10-17', 1),
+(100000000000002, 5004, 52250.00, 'Allocated', '2025-10-18', 4),
+(100000000000001, 5003, 13800.00, 'Waiting', '2025-10-17', 2),
+(100000000000003, 5006, 14900.00, 'Waiting', '2025-10-19', 7);
+
+INSERT INTO vehicle_details (vehicle_number, vehicle_type, capacity, last_service_date, status) VALUES
+('TN01A7890', 'Lorry (10-Wheeler)', 200, '2025-08-01', 'Intransit'),
+('TN04C5678', 'Tata Ace (Mini)', 20, '2025-10-01', 'Free'),
+('TN07D9012', 'Lorry (6-Wheeler)', 150, '2025-01-20', 'Free'),
+('TN11F7890', 'Tata Ace (Mini)', 20, '2025-08-25', 'Free'),
+('TN24K7890', 'Tata Ace (Mini)', 20, '2025-07-22', 'Free'),
+('TN32N9012', 'Eicher Truck', 100, '2025-08-08', 'Free'),
+('TN36O3456', 'Tata Ace (Mini)', 20, '2025-10-08', 'Free'),
+('TN18H5678', 'Tempo Traveller', 15, '2025-09-28', 'Free'),
+('TN28L1234', 'Tempo Traveller', 15, '2025-10-05', 'Free'),
+('TN02B1234', 'Eicher Truck', 100, '2025-09-15', 'Free'),
+('TN15G1234', 'Lorry (10-Wheeler)', 200, '2025-07-10', 'Free'),
+('TN30M5678', 'Lorry (10-Wheeler)', 200, '2025-09-20', 'InTransit'),
+('TN23J3456', 'Lorry (6-Wheeler)', 150, '2025-09-12', 'Free'),
+('TN10E3456', 'Eicher Truck', 100, '2025-09-05', 'Maintenance'),
+('TN21I9012', 'Eicher Truck', 100, '2025-08-15', 'Maintenance');
+
+INSERT INTO driver_details (driver_id, driver_name, contact_number, status) VALUES
+(101, 'Murali', '9444101101', 'Free'),
+(102, 'C. Magesh', '9894202202', 'InWork'),
+(103, 'Sreedhar', '9003303303', 'Free'),
+(104, 'Ragulraj', '8870404404', 'NotAvailable'),
+(105, 'Vinothkumar C.', '9361505505', 'InWork'),
+(106, 'G. Prem Kumar', '9600606606', 'Free'),
+(107, 'Aravindan', '8056707707', 'Free'),
+(108, 'Balamurugan', '9585808808', 'Free'),
+(109, 'Manikandan', '9443909909', 'NotAvailable'),
+(110, 'Raja Narayanan', '9790110011', 'Free');
+
+INSERT INTO dispatches (order_id, vehicle_number, driver_id, start_date, delivery_date) VALUES
+(100000000000000, 'TN30M5678', 105, '2025-10-19', '2025-10-21'),
+(100000000000002, 'TN01A7890', 102, '2025-10-19', '2025-10-21');
+
+INSERT INTO payment_details (payment_id, order_id, amount, pay_date) VALUES
+(10000, 100000000000000, 49800.00, '2025-10-17 10:15:00'),
+(10001, 100000000000002, 52250.00, '2025-10-18 14:30:00');
