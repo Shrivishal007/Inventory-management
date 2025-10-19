@@ -6,7 +6,7 @@ async function fetchInvoice(pool, userId, orderId, res) {
         const orderQuery = await pool.query(`
             SELECT o.order_id, o.total_price, 
             o.total_price * 0.05 AS cgst, o.total_price * 0.05 AS sgst, 
-            o.order_date, a.street, a.city, a.pincode, p.pay_date
+            o.order_date, a.street, a.city, a.pincode, p.payment_id, p.pay_date
             FROM orders o LEFT JOIN address_details a ON o.address_id = a.address_id
             JOIN payment_details p ON o.order_id = p.order_id
             WHERE o.order_id = $1`
@@ -20,7 +20,7 @@ async function fetchInvoice(pool, userId, orderId, res) {
         `, [orderId]);
         const dispatchQuery = await pool.query(
             `SELECT d.vehicle_number, dd.driver_name,
-            dd.contact_number, d.start_date, d.delivered_date
+            dd.contact_number, d.start_date, d.delivery_date
             FROM orders o JOIN dispatches d ON o.order_id = d.order_id
             JOIN driver_details dd ON d.driver_id = dd.driver_id
             WHERE o.order_id = $1`
@@ -44,6 +44,7 @@ async function fetchInvoice(pool, userId, orderId, res) {
             cgst: parseFloat(orderQuery.rows[0].cgst),
             sgst: parseFloat(orderQuery.rows[0].sgst),
             orderDate: orderQuery.rows[0].order_date,
+            paymentId: orderQuery.rows[0].payment_id,
             payDate: orderQuery.rows[0].pay_date,
 
             billingAddress: {
@@ -67,7 +68,7 @@ async function fetchInvoice(pool, userId, orderId, res) {
             driverName: dispatchQuery.rows[0].driver_name,
             driverContact: dispatchQuery.rows[0].contact_number,
             startDate: dispatchQuery.rows[0].start_date,
-            deliveredDate: dispatchQuery.rows[0].delivered_date
+            deliveryDate: dispatchQuery.rows[0].delivery_date
         } : null;
 
         const invoiceData = { salesperson, order, items, dispatch };

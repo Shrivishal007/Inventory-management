@@ -106,6 +106,11 @@ app.get('/api/admin/dashboard', async (req, res) => {
   await adminDetails(pool, res);
 });
 
+app.get('/api/admin/dashboard/:userId', async (req, res) => {
+  const { userId } = req.params;
+  await userDetails(pool, userId, res);
+});
+
 app.post('/api/sales-person/:userId/quotes', async (req, res) => {
   const userId = req.params.userId;
   const quotedItems = req.body;

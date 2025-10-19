@@ -37,8 +37,10 @@ async function orderPayment(pool, userId, orderId, action, addressId, res) {
                 [addressId, orderId]
             );
 
-            await client.query('INSERT INTO payment_details (order_id, amount, pay_date) VALUES ($1, $2, NOW()::TIMESTAMP(0))', [orderId, total_price]);
-
+            const paymentRes = await client.query('INSERT INTO payment_details (order_id, amount, pay_date) VALUES ($1, $2, NOW()::TIMESTAMP(0)) RETURNING payment_id'
+            , [orderId, total_price]);
+            const paymentId = paymentRes.rows[0].payment_id;
+            
             const dispatchResult = await allocateVehicle(client, orderId);
 
             if (!dispatchResult.success) {
@@ -51,6 +53,7 @@ async function orderPayment(pool, userId, orderId, action, addressId, res) {
             await client.query('COMMIT');
             return res.status(200).json({
                 message: 'Order paid and dispatch scheduled for the assigned address',
+                paymentId, 
                 orderId,
                 vehicleNumber: dispatchResult.vehicleNumber,
                 driverId: dispatchResult.driverId,
