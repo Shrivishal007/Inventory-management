@@ -26,7 +26,7 @@ async function changeRiceDetails(pool, updates, res) {
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ message: 'Transaction failed. No changes were applied.' });
+        return res.status(500).json({ error: 'Transaction failed. No changes were applied.' });
     }
 
     finally {

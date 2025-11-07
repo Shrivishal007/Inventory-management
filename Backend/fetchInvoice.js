@@ -77,7 +77,7 @@ async function fetchInvoice(pool, userId, orderId, res) {
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Failed to generate invoice' });
+        res.status(500).json({ error: 'Failed to generate invoice' });
     }
 }
 

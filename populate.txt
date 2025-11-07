@@ -75,17 +75,16 @@ INSERT INTO quote_items (quote_number, rice_id, quoted_price, quantity) VALUES
 (5005, 10, 1100.00, 4.00),
 (5005, 17, 1000.00, 6.00),
 (5006, 11, 1050.00, 8.00),
-(5006, 13, 1500.00, 5.00),
-(5007, 20, 950.00, 10.00);
+(5006, 13, 1500.00, 5.00);
 
-INSERT INTO orders (order_id, quote_number, total_price, status, order_date, address_id) VALUES
-(100000000000000, 5001, 49800.00, 'Allocated', '2025-10-17', 1),
-(100000000000002, 5004, 52250.00, 'Allocated', '2025-10-18', 4),
-(100000000000001, 5003, 13800.00, 'Waiting', '2025-10-17', 2),
-(100000000000003, 5006, 14900.00, 'Waiting', '2025-10-19', 7);
+INSERT INTO orders (quote_number, total_price, status, order_date, address_id) VALUES
+(5001, 49800.00, 'Allocated', '2025-10-17', 1),
+(5003, 13800.00, 'Waiting', '2025-10-17', 2),
+(5004, 52250.00, 'Allocated', '2025-10-18', 4),
+(5006, 14900.00, 'Waiting', '2025-10-19', 7);
 
 INSERT INTO vehicle_details (vehicle_number, vehicle_type, capacity, last_service_date, status) VALUES
-('TN01A7890', 'Lorry (10-Wheeler)', 200, '2025-08-01', 'Intransit'),
+('TN01A7890', 'Lorry (10-Wheeler)', 200, '2025-08-01', 'InTransit'),
 ('TN04C5678', 'Tata Ace (Mini)', 20, '2025-10-01', 'Free'),
 ('TN07D9012', 'Lorry (6-Wheeler)', 150, '2025-01-20', 'Free'),
 ('TN11F7890', 'Tata Ace (Mini)', 20, '2025-08-25', 'Free'),
@@ -117,6 +116,6 @@ INSERT INTO dispatches (order_id, vehicle_number, driver_id, start_date, deliver
 (100000000000000, 'TN30M5678', 105, '2025-10-19', '2025-10-21'),
 (100000000000002, 'TN01A7890', 102, '2025-10-19', '2025-10-21');
 
-INSERT INTO payment_details (payment_id, order_id, amount, pay_date) VALUES
-(10000, 100000000000000, 49800.00, '2025-10-17 10:15:00'),
-(10001, 100000000000002, 52250.00, '2025-10-18 14:30:00');
+INSERT INTO payment_details (order_id, amount, pay_date) VALUES
+(100000000000000, 49800.00, '2025-10-17 10:15:00'),
+(100000000000002, 52250.00, '2025-10-18 14:30:00');

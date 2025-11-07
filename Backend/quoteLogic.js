@@ -27,7 +27,7 @@ async function quoteLogic(pool, userId, quotedItems, res) {
             if (currentStock < quantityQuintals) {
                 await client.query('ROLLBACK');
                 return res.status(400).json({
-                    message: 'Quote rejected due to insufficient stock',
+                    error: 'Quote rejected due to insufficient stock',
                     riceId,
                     reason: `Requested quantity (${quantityKg} kg) exceeds available stock (${currentStock * 100} kg)`
                 });
@@ -94,7 +94,7 @@ async function quoteLogic(pool, userId, quotedItems, res) {
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ message: 'Database Error' });
+        return res.status(500).json({ error: 'Database Error' });
     }
 
     finally {

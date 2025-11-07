@@ -100,7 +100,7 @@ CREATE TABLE orders (
         status IN ('Waiting', 'Paid', 'Allocated', 'Delivered')
     ),
     order_date DATE,
-    address_id INTEGER NOT NULL REFERENCES address_details (address_id),
+    address_id INTEGER REFERENCES address_details (address_id),
     PRIMARY KEY (order_id)
 );
 

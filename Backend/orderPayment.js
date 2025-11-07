@@ -1,5 +1,3 @@
-import allocateVehicle from "./allocateVehicle.js";
-
 async function orderPayment(pool, userId, orderId, action, addressId, res) {
     const client = await pool.connect();
 
@@ -16,19 +14,19 @@ async function orderPayment(pool, userId, orderId, action, addressId, res) {
 
         if (orderRes.rows.length === 0) {
             await client.query('ROLLBACK');
-            return res.status(404).json({ message: 'Order not found' });
+            return res.status(404).json({ error: 'Order not found' });
         };
 
         const { status, sales_person_id, total_price } = orderRes.rows[0];
         if (parseInt(sales_person_id) !== parseInt(userId)) {
             await client.query('ROLLBACK');
-            return res.status(403).json({ message: 'Unauthorized access' });
+            return res.status(403).json({ error: 'Unauthorized access' });
         }
 
         if (action === 'Pay') {
             if (status !== 'Waiting') {
                 await client.query('ROLLBACK');
-                return res.status(400).json({ message: `Order is already ${status}` });
+                return res.status(400).json({ error: `Order is already ${status}` });
             }
 
             await client.query(
@@ -40,34 +38,16 @@ async function orderPayment(pool, userId, orderId, action, addressId, res) {
             const paymentRes = await client.query('INSERT INTO payment_details (order_id, amount, pay_date) VALUES ($1, $2, NOW()::TIMESTAMP(0)) RETURNING payment_id'
             , [orderId, total_price]);
             const paymentId = paymentRes.rows[0].payment_id;
-            
-            const dispatchResult = await allocateVehicle(client, orderId);
-
-            if (!dispatchResult.success) {
-                await client.query('ROLLBACK');
-                return res.status(500).json({
-                    message: dispatchResult.message + ' Transaction rolled back.'
-                });
-            }
 
             await client.query('COMMIT');
-            return res.status(200).json({
-                message: 'Order paid and dispatch scheduled for the assigned address',
-                paymentId, 
-                orderId,
-                vehicleNumber: dispatchResult.vehicleNumber,
-                driverId: dispatchResult.driverId,
-                startDate: dispatchResult.startDate,
-                deliveryDate: dispatchResult.deliveryDate
-            });
+            return res.status(200).json({ message: 'Payment successful', paymentId });
         }
-
     }
 
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        res.status(500).json({ message: 'Action failed' });
+        res.status(500).json({ error: 'Action failed' });
     }
 
     finally {

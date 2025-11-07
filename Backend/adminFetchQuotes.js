@@ -54,7 +54,7 @@ async function adminFetchQuotes(pool, res) {
 
     catch (err) {
         console.error(err);
-        return res.status(500).json({ message: 'Failed to retrieve pending quotes' });
+        return res.status(500).json({ error: 'Failed to retrieve pending quotes' });
     }
 }
 

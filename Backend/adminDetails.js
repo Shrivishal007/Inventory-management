@@ -17,7 +17,7 @@ async function adminDetails(pool, res) {
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Database Error' });
+        res.status(500).json({ error: 'Database Error' });
     }
 }
 

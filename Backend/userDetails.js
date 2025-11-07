@@ -4,7 +4,7 @@ async function userDetails(pool, userId, res) {
         const personalQuery = await pool.query('SELECT name, email_id FROM sales_person WHERE user_id = $1', [userId]);
 
         if (personalQuery.rows.length === 0) {
-            return res.status(404).json({ message: 'Salesperson not found' });
+            return res.status(404).json({ error: 'Salesperson not found' });
         }
 
         const { name, email_id: emailId } = personalQuery.rows[0];
@@ -12,13 +12,12 @@ async function userDetails(pool, userId, res) {
         const contactRes = await pool.query('SELECT contact_number FROM contact_details WHERE user_id = $1', [userId]);
         const contactNumbers = contactRes.rows.map(row => row.contact_number);
 
-        const addressRes = await pool.query('SELECT street, city, pincode FROM address_details WHERE user_id = $1', [userId]);
-        const addresses = addressRes.rows.map(row => ({ street: row.street, city: row.city, pincode: row.pincode }));
+        const addressRes = await pool.query('SELECT address_id, street, city, pincode FROM address_details WHERE user_id = $1', [userId]);
+        const addresses = addressRes.rows.map(row => ({ addressId: row.address_id, street: row.street, city: row.city, pincode: row.pincode }));
 
         const quoteQuery = `
             SELECT 
               q.quote_number,
-              qi.rice_id,
               r.rice_name,
               qi.quoted_price,
               qi.quantity,
@@ -31,14 +30,23 @@ async function userDetails(pool, userId, res) {
         `;
 
         const quoteRes = await pool.query(quoteQuery, [userId]);
-        const quotes = quoteRes.rows.map(row => ({
-            quoteNumber: row.quote_number,
-            riceId: row.rice_id,
-            riceName: row.rice_name,
-            quotedPrice: parseFloat(row.quoted_price),
-            quantity: parseFloat(row.quantity),
-            status: row.status
-        }));
+        const quotes = Object.values(
+            quoteRes.rows.reduce((acc, row) => {
+                if (!acc[row.quote_number])
+                    acc[row.quote_number] = {
+                        quoteNumber: row.quote_number,
+                        items: [],
+                        status: row.status,
+                    };
+
+                acc[row.quote_number].items.push({
+                    riceName: row.rice_name,
+                    quotedPrice: parseFloat(row.quoted_price),
+                    quantity: parseFloat(row.quantity),
+                });
+                return acc;
+            }, {})
+        );
 
         const orderQuery = `
             SELECT 
@@ -88,7 +96,7 @@ async function userDetails(pool, userId, res) {
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ message: 'Failed to retrieve salesperson information' });
+        res.status(500).json({ error: 'Failed to retrieve salesperson information' });
     }
 }
 

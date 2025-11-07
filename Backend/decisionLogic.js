@@ -11,13 +11,13 @@ async function decisionLogic(pool, quoteNumber, action, res) {
 
         if (quoteRes.rows.length === 0) {
             await client.query('ROLLBACK');
-            return res.status(404).json({ message: 'Quote not found' });
+            return res.status(404).json({ error: 'Quote not found' });
         }
 
         const currentStatus = quoteRes.rows[0].status;
         if (currentStatus !== 'Pending') {
             await client.query('ROLLBACK');
-            return res.status(400).json({ message: 'Quote is not pending' });
+            return res.status(400).json({ error: 'Quote is not pending' });
         }
 
         if (action === 'Reject') {
@@ -50,7 +50,7 @@ async function decisionLogic(pool, quoteNumber, action, res) {
                 );
                 await client.query('COMMIT');
                 return res.status(400).json({
-                    message: 'Quote rejected due to insufficient stock',
+                    error: 'Quote rejected due to insufficient stock',
                     riceId: item.rice_id,
                     reason: `Requested ${quantityQuintals * 100} kg exceeds available stock (${currentStock * 100} kg)`
                 });
@@ -86,7 +86,7 @@ async function decisionLogic(pool, quoteNumber, action, res) {
 
     catch (err) {
         await client.query('ROLLBACK');
-        return res.status(500).json({ message: 'Approval failed' });
+        return res.status(500).json({ error: 'Approval failed' });
     }
 
     finally {

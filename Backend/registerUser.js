@@ -28,14 +28,13 @@ async function registerUser(pool, formData, res) {
             await client.query(addressQuery, [userId, address.street, address.city, address.pincode]);
 
         await client.query('COMMIT');
-        console.log('Registration Completed!');
         return res.status(201).json({ userId, success: true, message: 'User created!' });
     }
 
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ message: 'Database Error' });
+        return res.status(500).json({ error: 'Database Error' });
     }
 
     finally {
