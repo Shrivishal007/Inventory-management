@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "lucide-react";
@@ -17,9 +17,7 @@ const UpdateStock = () => {
             setLoading(true);
             setError("");
             try {
-                const res = await axios.get(
-                    "http://localhost:3000/api/rice-varieties"
-                );
+                const res = await api().get("/rice-varieties");
                 setRiceList(res.data);
             } catch (err) {
                 console.error(err);
@@ -78,10 +76,7 @@ const UpdateStock = () => {
                     stockAvailable: parseFloat(rice.stockAvailable),
                 }));
 
-            const res = await axios.post(
-                "http://localhost:3000/api/set-prices",
-                updates
-            );
+            const res = await api().post("/set-prices", updates);
             toast.success(res.data?.message);
             setChangedRiceIds(new Set());
         } catch (err) {
@@ -132,7 +127,10 @@ const UpdateStock = () => {
                                         Max Price
                                     </th>
                                     <th className="py-3 px-4 text-left font-semibold border-b">
-                                        Stock Available (Quintals)
+                                        Stock Available (in Quintals)
+                                    </th>
+                                    <th className="py-3 px-4 text-left font-semibold border-b">
+                                        Last Changes made
                                     </th>
                                 </tr>
                             </thead>
@@ -217,6 +215,14 @@ const UpdateStock = () => {
                                                 }}
                                                 className="w-24 px-2 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-[#004aad]/50"
                                             />
+                                        </td>
+                                        <td>
+                                            {new Date(
+                                                rice.lastChangedDate
+                                            ).toLocaleString("en-IN", {
+                                                dateStyle: "medium",
+                                                timeStyle: "short",
+                                            })}
                                         </td>
                                     </tr>
                                 ))}

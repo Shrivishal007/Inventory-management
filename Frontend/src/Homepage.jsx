@@ -15,8 +15,9 @@ function HomePage() {
 
     return (
         <div className="font-montserrat">
-            <header className="sticky top-0 z-50 bg-blue-900 text-white shadow-md px-6 md:px-12 py-4 flex justify-between items-center">
-                <nav className="flex flex-wrap gap-5 text-sm md:text-base">
+            <header className="sticky top-0 z-50 bg-blue-900 text-white shadow-md px-6 md:px-10 py-4 flex justify-between items-center gap-5">
+                <img src="/icon.png" height={50} width={50}></img>
+                <nav className="flex flex-wrap gap-5 text-sm md:text-base mr-auto">
                     <p
                         onClick={() => scrollTo("about")}
                         className="cursor-pointer hover:underline"
@@ -226,13 +227,13 @@ function HomePage() {
                     600001
                 </div>
                 <div>
-                    Email:{" "}
+                    Email:&nbsp;
                     <a href="mailto:info@ismailrice.com" className="underline">
                         info@ismailrice.com
                     </a>
                 </div>
                 <div>
-                    Phone:{" "}
+                    Phone:&nbsp;
                     <a href="tel:+919176543432" className="underline">
                         +91 91765 43432
                     </a>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ArrowLeftIcon } from "lucide-react";
@@ -15,9 +15,7 @@ const OwnerQuotes = () => {
             setLoading(true);
             setError("");
             try {
-                const res = await axios.get(
-                    "http://localhost:3000/api/admin/quotes"
-                );
+                const res = await api().get("/admin/quotes");
                 setQuotes(res.data.pendingQuotes);
             } catch (err) {
                 console.error(err);
@@ -32,10 +30,7 @@ const OwnerQuotes = () => {
 
     const handleDecision = async (quoteNumber, action) => {
         try {
-            await axios.post("http://localhost:3000/api/admin/quotes", {
-                quoteNumber,
-                action,
-            });
+            await api().post("/admin/quotes", { quoteNumber, action });
             setQuotes((prev) =>
                 prev.filter((q) => q.quoteNumber !== quoteNumber)
             );
@@ -93,35 +88,16 @@ const OwnerQuotes = () => {
                                 key={idx}
                                 className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition"
                             >
-                                <div className="flex justify-between items-center mb-3">
-                                    <h3 className="text-lg font-semibold text-gray-800">
-                                        Quote #{q.quoteNumber}
-                                    </h3>
-                                    <span
-                                        className={`px-3 py-1 rounded-full text-sm font-medium ${
-                                            q.status === "Pending"
-                                                ? "bg-yellow-100 text-yellow-800"
-                                                : q.status === "Approved"
-                                                ? "bg-green-100 text-green-800"
-                                                : q.status === "Rejected"
-                                                ? "bg-red-100 text-red-800"
-                                                : "bg-gray-100 text-gray-700"
-                                        }`}
-                                    >
-                                        {q.status}
-                                    </span>
-                                </div>
+                                <h3 className="text-lg font-semibold text-gray-800 mb-3">
+                                    Quote #{q.quoteNumber}
+                                </h3>
 
                                 <p className="text-gray-700 mb-2">
-                                    <span className="font-semibold">
-                                        Salesperson ID:
-                                    </span>{" "}
+                                    <strong>Salesperson ID: </strong>
                                     {q.salesPersonId}
                                 </p>
                                 <p className="text-gray-700 mb-2">
-                                    <span className="font-semibold">
-                                        Salesperson Name:
-                                    </span>{" "}
+                                    <strong>Salesperson Name: </strong>
                                     {q.salesPersonName}
                                 </p>
 
@@ -135,16 +111,24 @@ const OwnerQuotes = () => {
                                                 <thead className="bg-[#e6f0ff] text-[#004aad]">
                                                     <tr>
                                                         <th className="py-2 px-3 text-left border">
+                                                            Rice Id
+                                                        </th>
+                                                        <th className="py-2 px-3 text-left border">
                                                             Rice
                                                         </th>
                                                         <th className="py-2 px-3 text-left border">
-                                                            Quantity (kg)
+                                                            Quantity (in
+                                                            Quintals)
                                                         </th>
                                                         <th className="py-2 px-3 text-left border">
-                                                            Price/kg (₹)
+                                                            Price/Quintal
                                                         </th>
                                                         <th className="py-2 px-3 text-left border">
-                                                            Subtotal (₹)
+                                                            Subtotal
+                                                        </th>
+                                                        <th className="py-2 px-3 text-left border">
+                                                            In Stock (in
+                                                            Quintals)
                                                         </th>
                                                     </tr>
                                                 </thead>
@@ -155,22 +139,50 @@ const OwnerQuotes = () => {
                                                             className="even:bg-gray-50 hover:bg-gray-100"
                                                         >
                                                             <td className="py-2 px-3 border">
+                                                                {item.riceId}
+                                                            </td>
+                                                            <td className="py-2 px-3 border">
                                                                 {item.riceName}
                                                             </td>
                                                             <td className="py-2 px-3 border">
-                                                                {item.quantity}
+                                                                {item.quantity.toLocaleString(
+                                                                    "en-IN",
+                                                                    {
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }
+                                                                )}
                                                             </td>
                                                             <td className="py-2 px-3 border">
-                                                                {
-                                                                    item.quotedPrice
-                                                                }
+                                                                {item.quotedPrice.toLocaleString(
+                                                                    "en-IN",
+                                                                    {
+                                                                        style: "currency",
+                                                                        currency:
+                                                                            "INR",
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }
+                                                                )}
                                                             </td>
                                                             <td className="py-2 px-3 border">
                                                                 {(
                                                                     item.quantity *
                                                                     item.quotedPrice
                                                                 ).toLocaleString(
-                                                                    "en-US",
+                                                                    "en-IN",
+                                                                    {
+                                                                        style: "currency",
+                                                                        currency:
+                                                                            "INR",
+                                                                        minimumFractionDigits: 2,
+                                                                        maximumFractionDigits: 2,
+                                                                    }
+                                                                )}
+                                                            </td>
+                                                            <td className="py-2 px-3 border">
+                                                                {item.stockAvailable.toLocaleString(
+                                                                    "en-IN",
                                                                     {
                                                                         minimumFractionDigits: 2,
                                                                         maximumFractionDigits: 2,
@@ -191,12 +203,17 @@ const OwnerQuotes = () => {
 
                                 <div className="mt-3 text-gray-700 space-y-1">
                                     <p>
-                                        <strong>Total Quantity:</strong>{" "}
-                                        {totalQuantity}
+                                        <strong>Total Quantity: </strong>
+                                        {totalQuantity.toLocaleString("en-IN", {
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })} quintal
                                     </p>
                                     <p>
-                                        <strong>Total Price:</strong> ₹
-                                        {totalPrice.toLocaleString("en-US", {
+                                        <strong>Total Price: </strong>
+                                        {totalPrice.toLocaleString("en-IN", {
+                                            style: "currency",
+                                            currency: "INR",
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2,
                                         })}

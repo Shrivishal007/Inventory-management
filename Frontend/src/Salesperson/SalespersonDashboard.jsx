@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
-import axios from "axios";
+import api from "../api";
 import { BarChart, FileText, PackageOpen } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -15,8 +15,8 @@ const SalespersonDashboard = () => {
     useEffect(() => {
         const fetchDashboardData = async () => {
             try {
-                const res = await axios.get(
-                    `http://localhost:3000/api/sales-person/dashboard/${userId}`
+                const res = await api().get(
+                    `/sales-person/dashboard/${userId}`
                 );
                 setSalesperson(res.data.salesperson);
             } catch (err) {
@@ -36,7 +36,7 @@ const SalespersonDashboard = () => {
 
     return (
         <div className="flex min-h-screen bg-[#f6f8fb] font-inter">
-            <aside className="w-[230px] bg-blue-900 text-white p-6">
+            <aside className="w-[230px] bg-blue-900 text-white p-6 sticky top-0 h-screen">
                 <h2 className="text-xl mb-6 text-center text-yellow-400 font-semibold">
                     Dealer Portal
                 </h2>
@@ -118,13 +118,14 @@ const SalespersonDashboard = () => {
                                     Total Transaction
                                 </h3>
                                 <p className="text-xl font-semibold text-gray-900">
-                                    ₹
                                     {salesperson.orders
                                         .reduce(
                                             (sum, o) => sum + o.totalPrice,
                                             0
                                         )
-                                        .toLocaleString("en-US", {
+                                        .toLocaleString("en-IN", {
+                                            style: "currency",
+                                            currency: "INR",
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2,
                                         })}
@@ -188,17 +189,25 @@ const SalespersonDashboard = () => {
                                                             {item.riceName}
                                                         </td>
                                                         <td className="p-3">
-                                                            ₹
                                                             {item.quotedPrice.toLocaleString(
-                                                                "en-US",
+                                                                "en-IN",
                                                                 {
+                                                                    style: "currency",
+                                                                    currency:
+                                                                        "INR",
                                                                     minimumFractionDigits: 2,
                                                                     maximumFractionDigits: 2,
                                                                 }
                                                             )}
                                                         </td>
                                                         <td className="p-3">
-                                                            {item.quantity}
+                                                            {item.quantity.toLocaleString(
+                                                                "en-IN",
+                                                                {
+                                                                    minimumFractionDigits: 2,
+                                                                    maximumFractionDigits: 2,
+                                                                }
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -264,10 +273,11 @@ const SalespersonDashboard = () => {
                                                     {o.orderStatus}
                                                 </td>
                                                 <td className="p-3">
-                                                    ₹
                                                     {o.totalPrice.toLocaleString(
-                                                        "en-US",
+                                                        "en-IN",
                                                         {
+                                                            style: "currency",
+                                                            currency: "INR",
                                                             minimumFractionDigits: 2,
                                                             maximumFractionDigits: 2,
                                                         }

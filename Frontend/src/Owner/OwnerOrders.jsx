@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -20,12 +20,11 @@ const OwnerOrders = () => {
                     Object.entries(appliedFilters).filter(([_, v]) => v)
                 )
             ).toString();
-            const res = await axios.get(
-                `http://localhost:3000/api/admin/orders${
-                    params ? `?${params}` : ""
-                }`
+            const res = await api().get(
+                `/admin/orders${params ? `?${params}` : ""}`
             );
             setOrders(res.data);
+            setError("");
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.error || err.message);
@@ -70,7 +69,7 @@ const OwnerOrders = () => {
                                     setSalespersonId(e.target.value);
                             }}
                             placeholder="1000"
-                            className="border border-gray-300 rounded-md p-2 w-32 text-sm focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 rounded-md p-2 w-32 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
 
@@ -181,8 +180,9 @@ const OwnerOrders = () => {
                                         {o.salesperson}
                                     </td>
                                     <td className="py-3 px-4">
-                                        ₹
-                                        {o.totalPrice?.toLocaleString("en-US", {
+                                        {o.totalPrice.toLocaleString("en-IN", {
+                                            style: "currency",
+                                            currency: "INR",
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2,
                                         })}

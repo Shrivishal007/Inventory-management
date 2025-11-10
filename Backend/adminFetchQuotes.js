@@ -49,6 +49,9 @@ async function adminFetchQuotes(pool, res) {
             });
         }
 
+        for (const quoteNum in groupedQuotes)
+            groupedQuotes[quoteNum].items.sort((a, b) => a.riceId - b.riceId);
+
         return res.status(200).json({ pendingQuotes: Object.values(groupedQuotes) });
     }
 

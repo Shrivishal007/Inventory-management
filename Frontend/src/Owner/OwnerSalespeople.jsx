@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -26,9 +26,7 @@ const OwnerSalespeople = () => {
     useEffect(() => {
         const fetchSalespeople = async () => {
             try {
-                const res = await axios.get(
-                    "http://localhost:3000/api/admin/dashboard/salesperson"
-                );
+                const res = await api().get("/admin/dashboard/salesperson");
                 setSalespeople(res.data);
                 setFilteredSalespeople(res.data);
             } catch (err) {
@@ -76,7 +74,7 @@ const OwnerSalespeople = () => {
                                 if (e.key === "Enter") handleApplyFilter();
                             }}
                             placeholder="Salesperson ID"
-                            className="border border-gray-300 rounded-md p-2 w-32 text-sm focus:ring-2 focus:ring-blue-500"
+                            className="border border-gray-300 rounded-md p-2 w-32 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                         />
                     </div>
                 </div>
@@ -113,13 +111,14 @@ const OwnerSalespeople = () => {
                         className="bg-white rounded-xl shadow-md p-6 mb-6 hover:shadow-lg transition"
                     >
                         <h3 className="text-lg font-semibold text-[#004aad] mb-2">
-                            {sp.name}{" "}
+                            {sp.name}
                             <span className="text-gray-600 text-sm">
-                                (ID: {sp.userId})
+                                {` (ID: ${sp.userId})`}
                             </span>
                         </h3>
                         <p className="text-gray-700 mb-3">
-                            <strong>Email:</strong> {sp.emailId || "N/A"}
+                            <strong>Email: </strong>
+                            {sp.emailId}
                         </p>
 
                         <div className="mb-4">
@@ -182,10 +181,10 @@ const OwnerSalespeople = () => {
                                                                     Rice Name
                                                                 </th>
                                                                 <th className="py-2 px-3 text-left border">
-                                                                    Quantity
+                                                                    Quantity (in Quintals)
                                                                 </th>
                                                                 <th className="py-2 px-3 text-left border">
-                                                                    Price (₹)
+                                                                    Price
                                                                 </th>
                                                             </tr>
                                                         </thead>
@@ -202,15 +201,21 @@ const OwnerSalespeople = () => {
                                                                             }
                                                                         </td>
                                                                         <td className="py-2 px-3 border">
-                                                                            {
-                                                                                item.quantity
-                                                                            }
+                                                                            {item.quantity.toLocaleString(
+                                                                                "en-IN",
+                                                                                {
+                                                                                    minimumFractionDigits: 2,
+                                                                                    maximumFractionDigits: 2,
+                                                                                }
+                                                                            )}
                                                                         </td>
                                                                         <td className="py-2 px-3 border">
-                                                                            ₹
-                                                                            {item.quotedPrice.toLocaleString(
-                                                                                "en-US",
+                                                                            {item.price.toLocaleString(
+                                                                                "en-IN",
                                                                                 {
+                                                                                    style: "currency",
+                                                                                    currency:
+                                                                                        "INR",
                                                                                     minimumFractionDigits: 2,
                                                                                     maximumFractionDigits: 2,
                                                                                 }
@@ -250,7 +255,10 @@ const OwnerSalespeople = () => {
                                                     Order No
                                                 </th>
                                                 <th className="py-2 px-3 text-left border">
-                                                    Total Price
+                                                    Quote No
+                                                </th>
+                                                <th className="py-2 px-3 text-left border">
+                                                    Total Price (without GST)
                                                 </th>
                                                 <th className="py-2 px-3 text-left border">
                                                     Order Date
@@ -284,10 +292,14 @@ const OwnerSalespeople = () => {
                                                         {o.orderId}
                                                     </td>
                                                     <td className="py-2 px-3 border">
-                                                        ₹
+                                                        {o.quoteNumber}
+                                                    </td>
+                                                    <td className="py-2 px-3 border">
                                                         {o.totalPrice.toLocaleString(
-                                                            "en-US",
+                                                            "en-IN",
                                                             {
+                                                                style: "currency",
+                                                                currency: "INR",
                                                                 minimumFractionDigits: 2,
                                                                 maximumFractionDigits: 2,
                                                             }

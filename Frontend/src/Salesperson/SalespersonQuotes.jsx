@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ArrowLeftIcon } from "lucide-react";
@@ -17,10 +17,11 @@ const SalespersonQuotes = () => {
 
     const fetchRice = async () => {
         try {
-            const res = await axios.get(
-                "http://localhost:3000/api/rice-varieties"
+            const res = await api().get("/rice-varieties");
+            const availableRice = res.data.filter(
+                (rice) => rice.stockAvailable > 0
             );
-            setRiceVarieties(res.data);
+            setRiceVarieties(availableRice);
 
             const initial = {};
             res.data.forEach((r) => {
@@ -38,10 +39,6 @@ const SalespersonQuotes = () => {
             setLoading(false);
         }
     };
-
-    useEffect(() => {
-        fetchRice();
-    }, []);
 
     const handleChange = (riceId, field, value) => {
         setFormValues((prev) => {
@@ -63,6 +60,23 @@ const SalespersonQuotes = () => {
             });
 
             return updated;
+        });
+    };
+
+    const clearRice = (riceId) => {
+        setFormValues((prev) => ({
+            ...prev,
+            [riceId]: {
+                ...prev[riceId],
+                quantity: "",
+                quotedPrice: "",
+            },
+        }));
+
+        setChangedRiceIds((prev) => {
+            const newSet = new Set(prev);
+            newSet.delete(riceId);
+            return newSet;
         });
     };
 
@@ -92,8 +106,8 @@ const SalespersonQuotes = () => {
 
         try {
             setSubmitting(true);
-            const res = await axios.post(
-                `http://localhost:3000/api/sales-person/${userId}/quotes`,
+            const res = await api().post(
+                `/sales-person/${userId}/quotes`,
                 updates
             );
 
@@ -115,6 +129,10 @@ const SalespersonQuotes = () => {
             setSubmitting(false);
         }
     };
+
+    useEffect(() => {
+        fetchRice();
+    }, []);
 
     return (
         <div className="mx-auto px-5 py-10 font-inter">
@@ -168,23 +186,27 @@ const SalespersonQuotes = () => {
                                     {rice.description}
                                 </p>
                                 <p className="text-sm text-gray-500 mt-2">
-                                    Price Range: ₹
+                                    <strong>Price Range: </strong>
                                     {(rice.minPrice / 4).toLocaleString(
-                                        "en-US",
+                                        "en-IN",
                                         {
+                                            style: "currency",
+                                            currency: "INR",
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2,
                                         }
-                                    )}{" "}
-                                    - ₹
+                                    )}
+                                    -
                                     {(rice.maxPrice / 4).toLocaleString(
-                                        "en-US",
+                                        "en-IN",
                                         {
+                                            style: "currency",
+                                            currency: "INR",
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2,
                                         }
-                                    )}{" "}
-                                    Per Bag
+                                    )}
+                                    <strong> Per Bag(25 kg)</strong>
                                 </p>
 
                                 <input
@@ -219,6 +241,12 @@ const SalespersonQuotes = () => {
                                     }
                                     className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-400 focus:outline-none text-sm"
                                 />
+                                <button
+                                    className="w-full mt-2 p-2 text-sm font-thin text-white rounded-lg bg-red-600 hover:bg-red-700"
+                                    onClick={() => clearRice(rice.riceId)}
+                                >
+                                    Clear
+                                </button>
                             </div>
                         ))}
                     </div>
