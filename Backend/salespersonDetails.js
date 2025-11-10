@@ -1,4 +1,4 @@
-async function salespersonDetails(pool, res) {
+async function salespersonDetails(pool) {
     try {
         const salespersonsObject = {};
 
@@ -32,8 +32,8 @@ async function salespersonDetails(pool, res) {
              q.sales_person_id,
              q.quote_number,
              r.rice_name,
-             qi.quoted_price,
              qi.quantity,
+             qi.quoted_price * qi.quantity AS price,
              q.status
             FROM quotes q
             JOIN quote_items qi ON q.quote_number = qi.quote_number
@@ -54,7 +54,7 @@ async function salespersonDetails(pool, res) {
                 acc[row.quote_number].items.push({
                     riceName: row.rice_name,
                     quantity: parseFloat(row.quantity),
-                    quotedPrice: parseFloat(row.quoted_price),
+                    price: parseFloat(row.price),
                 });
 
                 return acc;
@@ -73,6 +73,7 @@ async function salespersonDetails(pool, res) {
             SELECT 
              q.sales_person_id,
              o.order_id,
+             o.quote_number,
              o.total_price,
              o.order_date,
              dd.driver_name,
@@ -89,6 +90,7 @@ async function salespersonDetails(pool, res) {
             if (salespersonsObject[row.sales_person_id]) {
                 salespersonsObject[row.sales_person_id].orders.push({
                     orderId: row.order_id,
+                    quoteNumber: row.quote_number,
                     totalPrice: parseFloat(row.total_price),
                     orderDate: row.order_date,
                     driverName: row.driver_name,
@@ -100,12 +102,13 @@ async function salespersonDetails(pool, res) {
 
         const salespersons = Object.values(salespersonsObject);
 
-        res.status(200).json(salespersons);
+        return { status: 200, salespersons };
     } catch (err) {
         console.error(err);
-        res.status(500).json({
+        return {
+            status: 500,
             error: "Failed to retrieve salesperson information",
-        });
+        };
     }
 }
 

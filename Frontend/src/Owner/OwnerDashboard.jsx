@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../api";
 import {
     BarChart3,
     Package,
@@ -30,9 +30,7 @@ const OwnerDashboard = () => {
         try {
             setLoading(true);
             setError("");
-            const statsRes = await axios.get(
-                "http://localhost:3000/api/admin/dashboard"
-            );
+            const statsRes = await api().get("/admin/dashboard");
             const {
                 totalRevenue,
                 orderCount,
@@ -186,7 +184,15 @@ const OwnerDashboard = () => {
                             </div>
 
                             <p className="text-gray-500 mt-6 text-sm">
-                                Target: ₹{targetRevenue.toLocaleString()}
+                                {`Target: ${targetRevenue.toLocaleString(
+                                    "en-IN",
+                                    {
+                                        style: "currency",
+                                        currency: "INR",
+                                        minimumFractionDigits: 2,
+                                        maximumFractionDigits: 2,
+                                    }
+                                )}`}
                             </p>
                         </div>
 

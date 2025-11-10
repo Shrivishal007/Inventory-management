@@ -1,4 +1,5 @@
 -- Drop existing tables (optional)
+DROP TABLE IF EXISTS cancelled_orders CASCADE;
 DROP TABLE IF EXISTS payment_details CASCADE;
 DROP TABLE IF EXISTS dispatches CASCADE;
 DROP TABLE IF EXISTS driver_details CASCADE;
@@ -155,9 +156,49 @@ CREATE SEQUENCE payment_details_payment_id_seq START 10000;
 CREATE TABLE payment_details (
     payment_id INTEGER DEFAULT nextval('payment_details_payment_id_seq'),
     order_id BIGINT NOT NULL REFERENCES orders (order_id),
-    amount NUMERIC(10,2),
+    total_price NUMERIC(10,2),
+    tax NUMERIC(10,2) GENERATED ALWAYS AS (total_price * 0.05) STORED,
+    amount NUMERIC(10,2) GENERATED ALWAYS AS (total_price * 1.05) STORED,
     pay_date TIMESTAMP WITHOUT TIME ZONE,
     PRIMARY KEY (payment_id)
 );
 
 ALTER SEQUENCE payment_details_payment_id_seq OWNED BY payment_details.payment_id;
+
+-- ===========================
+-- 12. Cancelled Orders
+-- ===========================
+CREATE TABLE cancelled_orders (
+    order_id BIGINT PRIMARY KEY,
+    quote_number INTEGER,
+    amount NUMERIC(10,2),
+    order_date DATE,
+    cancelled_at TIMESTAMP WITHOUT TIME ZONE
+);
+
+CREATE OR REPLACE FUNCTION log_cancelled_order()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO cancelled_orders (
+    order_id,
+    quote_number,
+    amount,
+    order_date,
+    cancelled_at
+  )
+  VALUES (
+    OLD.order_id,
+    OLD.quote_number,
+    OLD.total_price,
+    OLD.order_date,
+    NOW()
+  );
+
+  RETURN OLD;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER delete_order
+AFTER DELETE ON orders
+FOR EACH ROW
+EXECUTE FUNCTION log_cancelled_order();

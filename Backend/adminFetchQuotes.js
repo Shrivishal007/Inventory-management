@@ -1,4 +1,4 @@
-async function adminFetchQuotes(pool, res) {
+async function adminFetchQuotes(pool) {
     try {
         const query = `
       SELECT 
@@ -23,7 +23,7 @@ async function adminFetchQuotes(pool, res) {
         const result = await pool.query(query);
 
         if (result.rows.length === 0) {
-            return res.status(200).json({ pendingQuotes: [] });
+            return { status: 200, pendingQuotes: [] };
         }
 
         const groupedQuotes = {};
@@ -49,12 +49,15 @@ async function adminFetchQuotes(pool, res) {
             });
         }
 
-        return res.status(200).json({ pendingQuotes: Object.values(groupedQuotes) });
+        for (const quoteNum in groupedQuotes)
+            groupedQuotes[quoteNum].items.sort((a, b) => a.riceId - b.riceId);
+
+        return { status: 200, pendingQuotes: Object.values(groupedQuotes) };
     }
 
     catch (err) {
         console.error(err);
-        return res.status(500).json({ error: 'Failed to retrieve pending quotes' });
+        return { status: 500, error: 'Failed to retrieve pending quotes' };
     }
 }
 

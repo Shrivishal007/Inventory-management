@@ -1,4 +1,4 @@
-async function adminDetails(pool, res) {
+async function adminDetails(pool) {
     try {
         const totalRevenue = await pool.query('SELECT COALESCE(SUM(amount), 0) AS total_revenue FROM payment_details');
         const salespersonCount = await pool.query('SELECT COUNT(*) AS salesperson_count FROM sales_person');
@@ -12,12 +12,12 @@ async function adminDetails(pool, res) {
             pendingQuoteCount: parseInt(pendingQuoteCount.rows[0].pending_quote_count)
         };
 
-        return res.status(200).json(stats);
+        return { status: 200, stats };
     }
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Database Error' });
+        return { status: 500, error: 'Database Error' };
     }
 }
 

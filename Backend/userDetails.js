@@ -1,10 +1,10 @@
-async function userDetails(pool, userId, res) {
+async function userDetails(pool, userId) {
 
     try {
         const personalQuery = await pool.query('SELECT name, email_id FROM sales_person WHERE user_id = $1', [userId]);
 
         if (personalQuery.rows.length === 0) {
-            return res.status(404).json({ error: 'Salesperson not found' });
+            return { status: 404, error: 'Salesperson not found' };
         }
 
         const { name, email_id: emailId } = personalQuery.rows[0];
@@ -89,14 +89,15 @@ async function userDetails(pool, userId, res) {
                 : null
         }));
 
-        res.status(200).json({
+        return {
+            status: 200,
             salesperson: { userId, name, emailId, contactNumbers, addresses, quotes, orders }
-        });
+        };
     }
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to retrieve salesperson information' });
+        return { status: 500, error: 'Failed to retrieve salesperson information' };
     }
 }
 

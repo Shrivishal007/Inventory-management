@@ -1,12 +1,11 @@
-async function fetchInvoice(pool, userId, orderId, res) {
+async function fetchInvoice(pool, userId, orderId) {
     try {
         const personalQuery = await pool.query('SELECT name, email_id FROM sales_person WHERE user_id = $1', [userId]);
         const contactQuery = await pool.query('SELECT contact_number FROM contact_details WHERE user_id = $1', [userId]);
         const addressQuery = await pool.query('SELECT street, city, pincode FROM address_details WHERE user_id = $1', [userId]);
         const orderQuery = await pool.query(`
-            SELECT o.order_id, o.total_price, 
-            o.total_price * 0.05 AS cgst, o.total_price * 0.05 AS sgst, 
-            o.order_date, a.street, a.city, a.pincode, p.payment_id, p.pay_date
+            SELECT o.order_id, o.total_price, o.order_date, a.street, 
+            a.city, a.pincode, p.payment_id, p.pay_date, p.tax, p.amount
             FROM orders o LEFT JOIN address_details a ON o.address_id = a.address_id
             JOIN payment_details p ON o.order_id = p.order_id
             WHERE o.order_id = $1`
@@ -41,8 +40,8 @@ async function fetchInvoice(pool, userId, orderId, res) {
         const order = {
             orderId: orderQuery.rows[0].order_id,
             totalPrice: parseFloat(orderQuery.rows[0].total_price),
-            cgst: parseFloat(orderQuery.rows[0].cgst),
-            sgst: parseFloat(orderQuery.rows[0].sgst),
+            tax: parseFloat(orderQuery.rows[0].tax),
+            amount: parseFloat(orderQuery.rows[0].amount),
             orderDate: orderQuery.rows[0].order_date,
             paymentId: orderQuery.rows[0].payment_id,
             payDate: orderQuery.rows[0].pay_date,
@@ -53,8 +52,6 @@ async function fetchInvoice(pool, userId, orderId, res) {
                 pincode: orderQuery.rows[0].pincode
             }
         };
-
-        order.grandTotal = order.totalPrice + order.cgst + order.sgst;
 
         const items = itemsQuery.rows.map(row => ({
             riceName: row.rice_name,
@@ -72,12 +69,12 @@ async function fetchInvoice(pool, userId, orderId, res) {
         } : null;
 
         const invoiceData = { salesperson, order, items, dispatch };
-        return res.status(200).json(invoiceData);
+        return { status: 200, invoiceData };
     }
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to generate invoice' });
+        return { status: 500, error: 'Failed to generate invoice' };
     }
 }
 

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api.js";
 import toast from "react-hot-toast";
 import InvoiceDownload from "./InvoiceDownload.jsx";
 import { ArrowLeftIcon } from "lucide-react";
@@ -19,9 +19,7 @@ const SalespersonOrders = () => {
 
     const fetchDashboardData = async () => {
         try {
-            const res = await axios.get(
-                `http://localhost:3000/api/sales-person/dashboard/${userId}`
-            );
+            const res = await api().get(`/sales-person/dashboard/${userId}`);
             const data = res.data.salesperson;
             setOrders(data.orders || []);
             setAddresses(data.addresses || []);
@@ -40,13 +38,23 @@ const SalespersonOrders = () => {
             return;
         }
         try {
-            const res = await axios.post(
-                `http://localhost:3000/api/sales-person/${userId}/orders/transaction`,
-                {
-                    action: "Pay",
-                    orderId,
-                    addressId: selectedAddressId,
-                }
+            const res = await api().post(`/sales-person/${userId}/orders/pay`, {
+                orderId,
+                addressId: selectedAddressId,
+            });
+            toast.success(res.data?.message);
+            fetchDashboardData();
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.error || err.message);
+        }
+    };
+
+    const cancelOrder = async (orderId) => {
+        try {
+            const res = await api().post(
+                `/sales-person/${userId}/orders/cancel`,
+                { orderId }
             );
             toast.success(res.data?.message);
             fetchDashboardData();
@@ -58,11 +66,9 @@ const SalespersonOrders = () => {
 
     const allocateOrder = async (orderId) => {
         try {
-            const res = await axios.post(
-                `http://localhost:3000/api/sales-person/${userId}/orders/allocate`,
-                {
-                    orderId,
-                }
+            const res = await api().post(
+                `/sales-person/${userId}/orders/allocate`,
+                { orderId }
             );
             toast.success(res.data?.message);
             fetchDashboardData();
@@ -74,11 +80,9 @@ const SalespersonOrders = () => {
 
     const downloadInvoice = async (orderId) => {
         try {
-            const res = await axios.get(
-                `http://localhost:3000/api/sales-person/${userId}/${orderId}`
-            );
+            const res = await api().get(`/sales-person/${userId}/${orderId}`);
             setInvoiceData(res.data);
-            // setTriggerDownload(true);
+            setTriggerDownload(true);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.error || err.message);
@@ -122,8 +126,10 @@ const SalespersonOrders = () => {
                                 <th className="py-3 px-4 text-left">
                                     Order ID
                                 </th>
-                                <th className="py-3 px-4 text-left">Quote</th>
-                                <th className="py-3 px-4 text-left">Total</th>
+                                <th className="py-3 px-4 text-left">Quote Number</th>
+                                <th className="py-3 px-4 text-left">Total Price</th>
+                                <th className="py-3 px-4 text-left">Tax</th>
+                                <th className="py-3 px-4 text-left">Amount</th>
                                 <th className="py-3 px-4 text-left">Status</th>
                                 <th className="py-3 px-4 text-center">
                                     Actions
@@ -141,8 +147,25 @@ const SalespersonOrders = () => {
                                         {o.quoteNumber}
                                     </td>
                                     <td className="py-3 px-4 font-medium text-gray-800">
-                                        ₹
-                                        {o.totalPrice?.toLocaleString("en-US", {
+                                        {o.totalPrice.toLocaleString("en-IN", {
+                                            style: "currency",
+                                            currency: "INR",
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}
+                                    </td>
+                                    <td className="py-3 px-4 font-medium text-gray-800">
+                                        {(o.totalPrice * 0.05).toLocaleString("en-IN", {
+                                            style: "currency",
+                                            currency: "INR",
+                                            minimumFractionDigits: 2,
+                                            maximumFractionDigits: 2,
+                                        })}
+                                    </td>
+                                    <td className="py-3 px-4 font-medium text-gray-800">
+                                        {(o.totalPrice * 1.05).toLocaleString("en-IN", {
+                                            style: "currency",
+                                            currency: "INR",
                                             minimumFractionDigits: 2,
                                             maximumFractionDigits: 2,
                                         })}
@@ -191,9 +214,7 @@ const SalespersonOrders = () => {
                                                                         a.addressId
                                                                     }
                                                                 >
-                                                                    {a.street},{" "}
-                                                                    {a.city} -{" "}
-                                                                    {a.pincode}
+                                                                    {`${a.street}, ${a.city} - ${a.pincode}`}
                                                                 </option>
                                                             )
                                                         )}
@@ -205,6 +226,16 @@ const SalespersonOrders = () => {
                                                         className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1.5 rounded-md text-sm transition-colors"
                                                     >
                                                         Pay
+                                                    </button>
+                                                    <button
+                                                        onClick={() =>
+                                                            cancelOrder(
+                                                                o.orderId
+                                                            )
+                                                        }
+                                                        className="bg-red-600 hover:bg-red-700 text-white px-4 py-1.5 rounded-md text-sm transition-colors"
+                                                    >
+                                                        Cancel
                                                     </button>
                                                 </div>
                                             )}

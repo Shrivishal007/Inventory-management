@@ -1,4 +1,4 @@
-async function allocateVehicle(pool, orderId, res) {
+async function allocateVehicle(pool, orderId) {
     const client = await pool.connect();
 
     try {
@@ -23,11 +23,10 @@ async function allocateVehicle(pool, orderId, res) {
         );
         if (vehicleRes.rows.length === 0) {
             await client.query("ROLLBACK");
-            return res
-                .status(400)
-                .json({
-                    error: "No suitable vehicle available. Expect delivery in a week.",
-                });
+            return {
+                status: 400,
+                error: "No suitable vehicle available. Expect delivery in a week.",
+            };
         }
         const vehicleNumber = vehicleRes.rows[0].vehicle_number;
 
@@ -37,11 +36,10 @@ async function allocateVehicle(pool, orderId, res) {
         );
         if (driverRes.rows.length === 0) {
             await client.query("ROLLBACK");
-            return res
-                .status(400)
-                .json({
-                    error: "No suitable driver available. Expect delivery in a week.",
-                });
+            return {
+                status: 400,
+                error: "No suitable driver available. Expect delivery in a week.",
+            };
         }
         const driverId = driverRes.rows[0].driver_id;
 
@@ -59,19 +57,22 @@ async function allocateVehicle(pool, orderId, res) {
         await client.query(`UPDATE vehicle_details SET status = 'InTransit' WHERE vehicle_number = $1`, [vehicleNumber]);
         await client.query(`UPDATE driver_details SET status = 'InWork' WHERE driver_id = $1`, [driverId]);
 
-        return res.status(200).json({
+        await client.query('COMMIT');
+        return {
+            status: 200,
             message:
                 "Vehicle and driver allocated successfully and Dispatch scheduled",
             vehicleNumber,
             driverId,
             startDate,
             deliveryDate,
-        });
+        };
     } 
     
     catch (err) {
+        await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ error: "Dispatch allocation failed" });
+        return { status: 500, error: "Dispatch allocation failed" };
     } 
     
     finally {

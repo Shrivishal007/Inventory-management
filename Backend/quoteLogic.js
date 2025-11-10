@@ -1,4 +1,4 @@
-async function quoteLogic(pool, userId, quotedItems, res) {
+async function quoteLogic(pool, userId, quotedItems) {
     const client = await pool.connect();
     let isAutoApproved = true;
     let totalPrice = 0;
@@ -26,11 +26,12 @@ async function quoteLogic(pool, userId, quotedItems, res) {
 
             if (currentStock < quantityQuintals) {
                 await client.query('ROLLBACK');
-                return res.status(400).json({
+                return {
+                    status: 400, 
                     error: 'Quote rejected due to insufficient stock',
                     riceId,
                     reason: `Requested quantity (${quantityKg} kg) exceeds available stock (${currentStock * 100} kg)`
-                });
+                };
             }
 
             if (pricePer100kg < min || pricePer100kg > max) {
@@ -63,13 +64,6 @@ async function quoteLogic(pool, userId, quotedItems, res) {
          VALUES ($1, $2, $3, $4)`,
                 [quoteNumber, item.riceId, item.pricePer100kg, item.quantityQuintals]
             );
-
-            if (isAutoApproved) {
-                await client.query(
-                    `UPDATE rice_details SET stock_available = stock_available - $1 WHERE rice_id = $2`,
-                    [item.quantityQuintals, item.riceId]
-                );
-            }
         }
 
         if (isAutoApproved) {
@@ -81,20 +75,21 @@ async function quoteLogic(pool, userId, quotedItems, res) {
         }
 
         await client.query('COMMIT');
-        return res.status(201).json({
+        return {
+            status: 201, 
             message: isAutoApproved
                 ? 'Quote approved and order created'
                 : 'Quote submitted for owner approval',
             quoteNumber,
-            status: quoteStatus
-        });
+            quoteStatus
+        };
 
     }
 
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ error: 'Database Error' });
+        return { status: 500, error: 'Database Error' };
     }
 
     finally {

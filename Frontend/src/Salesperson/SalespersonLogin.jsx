@@ -1,6 +1,6 @@
 import { useState } from "react";
 import "./AuthStyles.css";
-import axios from "axios";
+import api from "../api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import SignIn from "./SignIn";
@@ -24,10 +24,10 @@ const SalespersonLogin = () => {
         }
 
         try {
-            const res = await axios.post(
-                "http://localhost:3000/api/sales-person/login",
-                { emailId, password }
-            );
+            const res = await api().post("/sales-person/login", {
+                emailId,
+                password,
+            });
             toast.success(res.data.message);
             navigate(`/sales-person/dashboard/${res.data.userId}`);
         } catch (err) {
@@ -46,12 +46,13 @@ const SalespersonLogin = () => {
         const confirmPassword = form.confirmPassword.value;
 
         const addresses = addressList.map((address) => {
-            const [street, parts = ""] = address
+            const parts = address
                 .split(",")
                 .map((item) => item.trim());
-            const [city = "", pincode = ""] = parts
+            const [city = "", pincode = ""] = (parts.pop() || "")
                 .split("-")
                 .map((item) => item.trim());
+            const street = parts.join(", ");
             return { street, city, pincode };
         });
 
@@ -80,16 +81,13 @@ const SalespersonLogin = () => {
         }
 
         try {
-            const res = await axios.post(
-                "http://localhost:3000/api/sales-person/register",
-                {
-                    name,
-                    emailId,
-                    password,
-                    contacts,
-                    addresses,
-                }
-            );
+            const res = await api().post("/sales-person/register", {
+                name,
+                emailId,
+                password,
+                contacts,
+                addresses,
+            });
 
             toast.success(res.data.message);
             e.target.reset();

@@ -1,6 +1,6 @@
 import { hash } from 'bcrypt';
 
-async function registerUser(pool, formData, res) {
+async function registerUser(pool, formData) {
     const client = await pool.connect();
 
     try {
@@ -11,7 +11,7 @@ async function registerUser(pool, formData, res) {
         const existing = await client.query('SELECT * FROM sales_person WHERE email_id = $1', [formData.emailId]);
         if (existing.rows.length > 0) {
             await client.query('ROLLBACK');
-            return res.status(400).json({ success: false, error: 'Email already registered' });
+            return { status: 400, error: 'Email already registered' };
         }
 
         const userQuery = `INSERT INTO sales_person (name, email_id, password) VALUES ($1, $2, $3) RETURNING user_id`;
@@ -19,22 +19,25 @@ async function registerUser(pool, formData, res) {
 
         const userId = result.rows[0].user_id;
 
-        const contactQuery = `INSERT INTO contact_details (user_id, contact_number) VALUES ($1, $2)`;
-        for (const contact of formData.contacts)
-            await client.query(contactQuery, [userId, contact]);
+        const contactQuery = `INSERT INTO contact_details (user_id, contact_number) SELECT $1, * FROM UNNEST($2::text[])`;
+        await client.query(contactQuery, [userId, formData.contacts]);
 
-        const addressQuery = `INSERT INTO address_details (user_id, street, city, pincode) VALUES ($1, $2, $3, $4)`;
-        for (const address of formData.addresses)
-            await client.query(addressQuery, [userId, address.street, address.city, address.pincode]);
+        const addressQuery = `INSERT INTO address_details (user_id, street, city, pincode) SELECT $1, * FROM UNNEST($2::text[], $3::text[], $4::text[])`;
+        await client.query(addressQuery, [
+            userId,
+            formData.addresses.map((address) => address.street),
+            formData.addresses.map((address) => address.city),
+            formData.addresses.map((address) => address.pincode),
+        ]);
 
         await client.query('COMMIT');
-        return res.status(201).json({ userId, success: true, message: 'User created!' });
+        return { status: 201, userId, message: 'User created!' };
     }
 
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ error: 'Database Error' });
+        return { status: 500, error: 'Database Error' };
     }
 
     finally {

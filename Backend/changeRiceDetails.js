@@ -1,4 +1,4 @@
-async function changeRiceDetails(pool, updates, res) {
+async function changeRiceDetails(pool, updates) {
     const client = await pool.connect();
 
     try {
@@ -16,17 +16,18 @@ async function changeRiceDetails(pool, updates, res) {
         }
 
         await client.query('COMMIT');
-        return res.status(200).json({
+        return {
+            status: 200,
             message: `Batch update successful. ${successfulUpdates} rice types were updated.`,
             updatedCount: successfulUpdates
-        });
+        };
 
     }
 
     catch (err) {
         await client.query('ROLLBACK');
         console.error(err);
-        return res.status(500).json({ error: 'Transaction failed. No changes were applied.' });
+        return { status: 500, error: 'Transaction failed. No changes were applied.' };
     }
 
     finally {

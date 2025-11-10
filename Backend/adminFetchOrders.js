@@ -1,4 +1,4 @@
-async function adminFetchOrders(pool, filterOption, res) {
+async function adminFetchOrders(pool, filterOption) {
 
     try {
         let query = `
@@ -35,12 +35,12 @@ async function adminFetchOrders(pool, filterOption, res) {
             salespersonId: row.user_id
         }));
 
-        res.status(200).json(orders);
+        return { status: 200, orders };
     }
 
     catch (err) {
         console.error(err);
-        res.status(500).json({ error: 'Failed to fetch orders' });
+        return { status: 500, error: 'Failed to fetch orders' };
     }
 }
 
