@@ -30,39 +30,15 @@ async function decisionLogic(pool, quoteNumber, action, res) {
         }
 
         const itemsRes = await client.query(
-            `SELECT qi.rice_id, qi.quoted_price, qi.quantity, r.stock_available
-            FROM quote_items qi
-            JOIN rice_details r ON qi.rice_id = r.rice_id
-            WHERE qi.quote_number = $1`,
+            `SELECT quantity, quoted_price FROM quote_items WHERE quote_number = $1`,
             [quoteNumber]
         );
 
-        let totalPrice = 0;
-
-        for (const item of itemsRes.rows) {
-            const quantityQuintals = parseFloat(item.quantity);
-            const currentStock = parseFloat(item.stock_available);
-
-            if (currentStock < quantityQuintals) {
-                await client.query(
-                    `UPDATE quotes SET status = 'Rejected' WHERE quote_number = $1`,
-                    [quoteNumber]
-                );
-                await client.query('COMMIT');
-                return res.status(400).json({
-                    error: 'Quote rejected due to insufficient stock',
-                    riceId: item.rice_id,
-                    reason: `Requested ${quantityQuintals * 100} kg exceeds available stock (${currentStock * 100} kg)`
-                });
-            }
-
-            totalPrice += parseFloat(item.quoted_price) * quantityQuintals * 100;
-
-            await client.query(
-                `UPDATE rice_details SET stock_available = stock_available - $1 WHERE rice_id = $2`,
-                [quantityQuintals, item.rice_id]
-            );
-        }
+        const totalPrice = itemsRes.rows.reduce(
+            (sum, item) =>
+                sum + parseFloat(item.quantity) * parseFloat(item.quoted_price),
+            0
+        );
 
         await client.query(
             `UPDATE quotes SET status = 'Approved' WHERE quote_number = $1`,

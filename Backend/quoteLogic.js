@@ -63,13 +63,6 @@ async function quoteLogic(pool, userId, quotedItems, res) {
          VALUES ($1, $2, $3, $4)`,
                 [quoteNumber, item.riceId, item.pricePer100kg, item.quantityQuintals]
             );
-
-            if (isAutoApproved) {
-                await client.query(
-                    `UPDATE rice_details SET stock_available = stock_available - $1 WHERE rice_id = $2`,
-                    [item.quantityQuintals, item.riceId]
-                );
-            }
         }
 
         if (isAutoApproved) {

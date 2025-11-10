@@ -59,6 +59,7 @@ async function allocateVehicle(pool, orderId, res) {
         await client.query(`UPDATE vehicle_details SET status = 'InTransit' WHERE vehicle_number = $1`, [vehicleNumber]);
         await client.query(`UPDATE driver_details SET status = 'InWork' WHERE driver_id = $1`, [driverId]);
 
+        await client.query('COMMIT');
         return res.status(200).json({
             message:
                 "Vehicle and driver allocated successfully and Dispatch scheduled",
@@ -70,6 +71,7 @@ async function allocateVehicle(pool, orderId, res) {
     } 
     
     catch (err) {
+        await client.query('ROLLBACK');
         console.error(err);
         return res.status(500).json({ error: "Dispatch allocation failed" });
     } 

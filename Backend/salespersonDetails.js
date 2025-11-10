@@ -73,6 +73,7 @@ async function salespersonDetails(pool, res) {
             SELECT 
              q.sales_person_id,
              o.order_id,
+             o.quote_number,
              o.total_price,
              o.order_date,
              dd.driver_name,
@@ -89,6 +90,7 @@ async function salespersonDetails(pool, res) {
             if (salespersonsObject[row.sales_person_id]) {
                 salespersonsObject[row.sales_person_id].orders.push({
                     orderId: row.order_id,
+                    quoteNumber: row.quote_number,
                     totalPrice: parseFloat(row.total_price),
                     orderDate: row.order_date,
                     driverName: row.driver_name,

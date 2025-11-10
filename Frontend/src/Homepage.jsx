@@ -226,13 +226,13 @@ function HomePage() {
                     600001
                 </div>
                 <div>
-                    Email:{" "}
+                    Email:&nbsp;
                     <a href="mailto:info@ismailrice.com" className="underline">
                         info@ismailrice.com
                     </a>
                 </div>
                 <div>
-                    Phone:{" "}
+                    Phone:&nbsp;
                     <a href="tel:+919176543432" className="underline">
                         +91 91765 43432
                     </a>

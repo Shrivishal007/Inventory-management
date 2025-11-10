@@ -57,7 +57,7 @@ const SignUp = ({
                         type="text"
                         placeholder={`Address ${
                             index + 1
-                        } (Street, City - Pincode)`}
+                        } (Street Address, City - Pincode)`}
                         value={address}
                         onChange={(e) => {
                             const newAddresses = [...addressList];
@@ -68,7 +68,7 @@ const SignUp = ({
                         className="bg-blue-50 border border-blue-200 rounded-md p-3 my-1 w-full text-sm focus:border-blue-500 focus:outline-none transition duration-300"
                     />
                     {addressList.length > 1 && (
-                        <button
+                        <button type="button"
                             onClick={() => {
                                 const newAddresses = addressList.filter(
                                     (_, i) => i !== index
@@ -83,7 +83,7 @@ const SignUp = ({
                 </div>
             ))}
 
-            <button
+            <button type="button"
                 className="flex items-center justify-center gap-2 bg-gray-100 text-blue-600 text-sm font-medium py-2 px-3 rounded-xl mt-1 mb-2 hover:bg-gray-200 transition duration-300 add-btn"
                 onClick={() => setAddressList([...addressList, ""])}
             >
@@ -110,7 +110,7 @@ const SignUp = ({
                         className="bg-blue-50 border border-blue-200 rounded-md p-3 my-1 w-full text-sm focus:border-blue-500 focus:outline-none transition duration-300"
                     />
                     {contacts.length > 1 && (
-                        <button
+                        <button type="button"
                             onClick={() => {
                                 const newContacts = contacts.filter(
                                     (_, i) => i !== index
@@ -125,7 +125,7 @@ const SignUp = ({
                 </div>
             ))}
 
-            <button
+            <button type="button"
                 className="flex items-center justify-center gap-2 bg-gray-100 text-blue-600 text-sm font-medium py-2 px-3 rounded-xl mt-1 mb-4 hover:bg-gray-200 transition duration-300"
                 onClick={() => setContacts([...contacts, ""])}
             >

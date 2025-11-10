@@ -14,7 +14,7 @@ import quoteLogic from './quoteLogic.js';
 import adminFetchQuotes from './adminFetchQuotes.js';
 import decisionLogic from './decisionLogic.js';
 import adminFetchOrders from './adminFetchOrders.js';
-import orderPayment from './orderPayment.js';
+import payOrder from './payOrder.js';
 import allocateVehicle from './allocateVehicle.js';
 import fetchInvoice from './fetchInvoice.js';
 
@@ -39,7 +39,7 @@ app.get('/', (req, res) => { res.send("Server is running"); })
 app.post('/api/admin/login', (req, res) => {
   const { adminId, password } = req.body;
 
-  if (adminId == process.env.OWNER_ID && password == process.env.OWNER_PASSWORD)
+  if (adminId === process.env.OWNER_ID && password === process.env.OWNER_PASSWORD)
     return res.status(200).json({ message: "Admin login success!" });
 
   return res.status(400).json({ error: "Admin login failed!" });
@@ -75,7 +75,7 @@ app.post('/api/sales-person/register', async (req, res) => {
 app.use('/images', express.static(path.join(__dirname, 'images')));
 app.get('/api/rice-varieties', async (req, res) => {
   try {
-    const result = await pool.query('SELECT rice_id, rice_name, description, stock_available, min_price, max_price, img_path FROM rice_details WHERE stock_available > 0 ORDER BY rice_id');
+    const result = await pool.query('SELECT * FROM rice_details ORDER BY rice_id');
     const riceVarieties = result.rows.map(row => ({
       riceId: row.rice_id,
       riceName: row.rice_name,
@@ -83,6 +83,7 @@ app.get('/api/rice-varieties', async (req, res) => {
       stockAvailable: parseFloat(row.stock_available),
       minPrice: parseFloat(row.min_price),
       maxPrice: parseFloat(row.max_price),
+      lastChangedDate: row.last_changed_date,
       imgUrl: `${req.protocol}://${req.get('host')}${row.img_path}`
     }));
 
@@ -128,10 +129,26 @@ app.post('/api/admin/quotes', async (req, res) => {
   await decisionLogic(pool, quoteNumber, action, res)
 });
 
-app.post('/api/sales-person/:userId/orders/transaction', async (req, res) => {
+app.post('/api/sales-person/:userId/orders/pay', async (req, res) => {
   const { userId } = req.params;
-  const { action, orderId, addressId } = req.body;
-  await orderPayment(pool, userId, orderId, action, addressId, res);
+  const { orderId, addressId } = req.body;
+  await payOrder(pool, userId, orderId, addressId, res);
+});
+
+app.post('/api/sales-person/:userId/orders/cancel', async (req, res) => {
+  const { orderId } = req.body;
+  try {
+    const result = await pool.query('DELETE FROM orders WHERE order_id = $1', [orderId]);
+    if (result.rowCount === 0)
+      return res.status(400).json({ error: 'Order not found' });
+        
+    return res.status(200).json({ message: 'Cancellation successful' });
+  } 
+
+  catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Cancellation failed' });
+  } 
 });
 
 app.post('/api/sales-person/:userId/orders/allocate', async (req, res) => {
